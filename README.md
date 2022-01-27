@@ -26,7 +26,3 @@ Algorithm steps:
 - The algorithm uses a Brute force approach for searching the correct bonds between the atoms
 
 - Drawing the bonding between atoms of a molecule
-
-
-![image](https://user-images.githubusercontent.com/98529796/151413483-bc2a1d9d-2737-4881-a4e5-cd1468693e5a.png)
-
