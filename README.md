@@ -15,12 +15,18 @@ It is the simplest and most limited theory on electronic structure.
 
 Algorithm steps:
 - Building a dictionary where for every element there are the available bonds
-     Symbol : (available oxidation states)
 
-- Use a predefined periodic table dictionary and formulae, split the chemical formulae string into the different elements,
-  including dealing with parenthesis + encapsulates debuging flags
+- Use a predefined periodic table dictionary and formulae, split the chemical formulae string into the different elements, including dealing with parenthesis
 
 - Recursive function that builds the molecule, runs through elements to bond the different atoms based on Madelung rule.
-   The algorithem uses a Brute force approach for searching the correct bonds between the atoms such that they are all fulfilled,          ignoring circular bonds 
+
+     First Class – Atom: Represents a molecule atom with it's bonds
+     Second Class – ChemistryFormulae: Represent a chemistry formula if the initialization succeeds
+
+- The algorithm uses a Brute force approach for searching the correct bonds between the atoms
 
 - Drawing the bonding between atoms of a molecule
+
+
+![image](https://user-images.githubusercontent.com/98529796/151413483-bc2a1d9d-2737-4881-a4e5-cd1468693e5a.png)
+
