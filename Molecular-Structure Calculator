@@ -30,11 +30,12 @@ unfavor = "unfavor"
 periodic_table_dict["C"] = (-4, 4)
 periodic_table_dict[("C", unfavor)]= (2,)
 
-#oxidation state samples:
-print(" H:" + str(periodic_table_dict["H"]))
-print(" O:" + str(periodic_table_dict["O"]))
-print(" B:" + str(periodic_table_dict["B"]))
-print(" C:" + str(periodic_table_dict["C"]) + str(periodic_table_dict[("C", unfavor)]))
+
+#The Atom class represents a Molecule atom with it's bonds. its' properties are:
+#*   Unique identifier (_id)
+#*   Chemical symbol (_symbol)
+#*   The current number of available bonds (_bonds)
+#*   The current bonds (_bonds_list)
 
 ############################################################################
 ############################################################################
@@ -103,7 +104,21 @@ class Atom:
     ion_str = f"<{self._bonds:+2}>" if self._bonds != 0 else ""
     return f"[{self._id:2}] {self._symbol:2} {ion_str:5} {bonds_list_str:13}"
     
-    import networkx as nx
+    
+    
+#The ChemistryFormulae class is the representation of a chemistry formulae or a molecule if the initialization succeedes. its properties are:
+
+#The relevant periodic table (_periodic_table_dict)
+#The initializing string formulae (_formulae)
+#The splitted formulae into elements' symbols (_symbols)
+#For speed purposes the length of _symbols (nsymbols)
+#The 'molecule', which is a list based graph representing the atoms and bonds (_atoms)
+#it also encapsulates debuging flags:
+
+#number of debugging printout lines (_verbose_count)
+#debug print out function reference (_verbose) which reference either _debug or _debug_pass. the latter does nothing
+
+import networkx as nx
 
 ############################################################################
 ############################################################################
@@ -407,7 +422,6 @@ class ChemisteryFormulae:
       self._atoms[a].bond(b, +bonds)
       self._atoms[b].bond(a, -bonds)
       self._verbose(n, "bonded", self._atoms[b], self._atoms[a])
-
       
       if n < self._n_symbols and self._is_seperate_molecule(b): #did we create a seperated molecule from less atoms?   
         self._verbose(n, "rejected, detected complete molecule", self._atoms[b], self._atoms[a])     
@@ -461,54 +475,64 @@ class ChemisteryFormulae:
     ############################################################################
     def draw(self):
       
-      M = nx.Graph()    
-
-      strength_properties = {1 : ('r', 1), 2 : ('b', 10), 3 : ('g', 15), 4 : ('y', 20)}
+      M = nx.MultiGraph()    
 
       # running through elements to bond the different atoms
       for s, atom_s in enumerate(self._atoms):
+
         for b, atom_b in enumerate(self._atoms):
 
           if s >= b:  #just need to add the edge once
             continue
 
           #single, double, triple (or higher) bond?
-          strength = min([4, atom_s.bonds_list().count(b)])
+          strength = atom_s.bonds_list().count(b)
+ 
+          if strength > 0:
+            M.add_edges_from( [(s, b)] * strength)
 
-          if strength >= 1:
-            edge_color, edge_width = strength_properties[strength]
-            M.add_edge(b, s, color = edge_color, weight = edge_width)
 
       pos     = nx.spring_layout(M)
-      edges   = M.edges()
-      colors  = [M[u][v]['color']  for u, v in edges]
-      weights = [M[u][v]['weight'] for u, v in edges]      
       labels  = {atom.id(): atom.symbol() for atom in self._atoms}
-
-      nx.draw(M, pos, edge_color = colors, width = weights, node_size = 1200) 
+      nx.draw_networkx_nodes(M, pos, node_size = 1200)
       nx.draw_networkx_labels(M, pos, labels, font_size = 22, font_color = "whitesmoke")
+
+      ax = plt.gca()
+      for e in M.edges:
+        ax.annotate("",
+                xy = pos[e[0]], xycoords = 'data',
+                xytext = pos[e[1]], textcoords = 'data',
+                arrowprops = dict(arrowstyle = "-", color = "0.5",
+                                shrinkA = 5, shrinkB =5 ,
+                                patchA = None, patchB = None,
+                                connectionstyle = "arc3,rad=rrr".replace('rrr', str(0.3 * e[2])
+                                ),
+                                ),
+                )
+                
+                
+                import matplotlib.pyplot as plt
+
 try:
-  molecule = ChemisteryFormulae(periodic_table_dict, "CWQH3")
-  print(molecule)
-  
+
+  input1 = input('Please insert your molecule formulae to receive its Lewis Model: ')
+  #molecule = ChemisteryFormulae(periodic_table_dict, "CH3CH2OH")
+  #molecule = ChemisteryFormulae(periodic_table_dict, "CH3CHCH2")
+  #molecule = ChemisteryFormulae(periodic_table_dict, "CH3(CH2)5CH3")
+  #molecule = ChemisteryFormulae(periodic_table_dict, "PCl5")
+  #molecule = ChemisteryFormulae(periodic_table_dict, "CH2CH2")
+  #molecule = ChemisteryFormulae(periodic_table_dict, "COHLi")
+  #molecule = ChemisteryFormulae(periodic_table_dict, "CH3SCH2CH2CH(NH2)CO2H")
+  molecule = ChemisteryFormulae(periodic_table_dict, input1)
+
+  #sets a 'good' phisical size for the image output
+  plt.rcParams["figure.figsize"] = (10, 10)
+
+  molecule.draw()
+  #print(molecule)
+
+  plt.axis("off")
+  plt.show()
+
 except Exception as e:
   print(e)
-  import matplotlib.pyplot as plt
-
-#sets a 'good' phisical size for the image output
-plt.rcParams["figure.figsize"] = (10, 10)
-
-#molecule = ChemisteryFormulae(periodic_table_dict, "CH3CH2OH")
-molecule = ChemisteryFormulae(periodic_table_dict, "CH3WHCH2")
-#molecule = ChemisteryFormulae(periodic_table_dict, "CH3(CH2)5CH3")
-#molecule = ChemisteryFormulae(periodic_table_dict, "PCl5")
-#molecule = ChemisteryFormulae(periodic_table_dict, "CH2CH2")
-#olecule = ChemisteryFormulae(periodic_table_dict, "COHLi")
-#molecule = ChemisteryFormulae(periodic_table_dict, "CH3SCH2CH2CH(NH2)CO2H")
-molecule.draw()
-#print(molecule)
-
-ax = plt.gca()
-ax.margins(0.20)
-plt.axis("off")
-plt.show()
