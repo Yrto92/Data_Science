@@ -21,6 +21,7 @@ Algorithm steps:
 - Recursive function that builds the molecule, runs through elements to bond the different atoms based on Madelung rule.
 
      First Class – Atom: Represents a molecule atom with it's bonds
+     
      Second Class – ChemistryFormulae: Represent a chemistry formula if the initialization succeeds
 
 - The algorithm uses a Brute force approach for searching the correct bonds between the atoms
